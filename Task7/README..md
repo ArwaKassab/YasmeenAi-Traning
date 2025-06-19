@@ -40,5 +40,3 @@
     ```bash
     python manage.py migrate
     ```
-3. تشغيل الخادم:
-   
