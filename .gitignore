@@ -1,0 +1,29 @@
+# Ignore Python cache and compiled files
+**/__pycache__/
+**/*.py[cod]
+
+# Ignore virtual environment folders anywhere in the repo
+**/venv/
+**/env/
+**/.venv/
+
+# Ignore SQLite database files
+**/*.sqlite3
+
+# Ignore environment variable files
+**/.env
+
+# Ignore Django migration caches
+**/migrations/__pycache__/
+**/migrations/*.py[cod]
+
+# Ignore media and static files
+**/media/
+**/staticfiles/
+
+# Ignore IDE/editor config folders
+.vscode/
+.idea/
+
+# Ignore system files
+.DS_Store
