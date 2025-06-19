@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.sqlite3
+
+# Django
+*.log
+db.sqlite3
+media/
+staticfiles/
+
+# Environments
+venv/
+env/
+ENV/
+.venv/
+
+# VSCode settings
+.vscode/
+
+# Mac and Linux system files
+.DS_Store
+
+# Pip dependency files
+pip-log.txt
+
+# PyCharm
+.idea/
+
+# Migrations
+*/migrations/__pycache__/
+*/migrations/*.py[cod]
+
+# Env files
+.env
+
+# Other
+*.swp
