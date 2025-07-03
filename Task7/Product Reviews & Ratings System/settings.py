@@ -83,9 +83,9 @@ WSGI_APPLICATION = 'Product Reviews & Ratings System.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'task7_db',
-        'USER': 'postgres',
-        'PASSWORD': 'arwa',
+        'NAME': 'yasmeen_db',
+        'USER': 'mobadot',
+        'PASSWORD': 'Editmoba13579&%#!',
         'HOST': 'localhost',
         'PORT': '5432',
     }
