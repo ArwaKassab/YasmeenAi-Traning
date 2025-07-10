@@ -11,7 +11,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         model = Review
         fields = [
             'id', 'product', 'user', 'user_name', 'product_name',
-            'rating', 'text', 'created_at', 'updated_at', 'is_approved'
+            'rating', 'text', 'created_at', 'updated_at', 'approval_status'
         ]
         read_only_fields = ['user', 'created_at', 'updated_at']
 
@@ -26,13 +26,11 @@ class ReviewSerializer(serializers.ModelSerializer):
         return value
 
     def validate(self, attrs):
-        # التحقق من عدم وجود مراجعة سابقة للمستخدم نفسه
         request = self.context.get('request')
         if request and hasattr(request, 'user'):
             user = request.user
             product = attrs.get('product')
 
-            # في حالة الإنشاء
             if not self.instance:
                 if Review.objects.filter(user=user, product=product).exists():
                     raise serializers.ValidationError("لقد قمت بمراجعة هذا المنتج من قبل")

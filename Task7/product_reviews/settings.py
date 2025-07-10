@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -45,6 +46,10 @@ INSTALLED_APPS = [
     'accounts',
     'products',
     'reviews',
+    'django_filters',
+    'channels',
+    'notifications'
+
 ]
 
 MIDDLEWARE = [
@@ -57,7 +62,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'Product Reviews & Ratings System.urls'
+ROOT_URLCONF = 'product_reviews.urls'
 
 TEMPLATES = [
     {
@@ -74,7 +79,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'Product Reviews & Ratings System.wsgi.application'
+WSGI_APPLICATION = 'product_reviews.wsgi.application'
 
 
 # Database
@@ -83,9 +88,9 @@ WSGI_APPLICATION = 'Product Reviews & Ratings System.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'yasmeen_db',
-        'USER': 'mobadot',
-        'PASSWORD': 'Editmoba13579&%#!',
+        'NAME': 'task7_db',
+        'USER': 'postgres',
+        'PASSWORD': 'arwa',
         'HOST': 'localhost',
         'PORT': '5432',
     }
@@ -140,3 +145,27 @@ REST_FRAMEWORK = {
     )
 }
 AUTH_USER_MODEL = 'accounts.User'
+
+
+ASGI_APPLICATION = 'product_reviews.asgi.application'
+
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
+
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
+    "ROTATE_REFRESH_TOKENS": False,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "ALGORITHM": "HS256",
+    "SIGNING_KEY": SECRET_KEY,
+    "AUTH_HEADER_TYPES": ("Bearer",),
+}

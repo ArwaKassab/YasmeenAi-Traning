@@ -11,6 +11,7 @@ from .serializers import (
     ReviewUpdateSerializer, ProductRatingSummarySerializer
 )
 from .permissions import IsOwnerOrReadOnly, IsAdminOrReadOnly
+from notifications.realtime import notify_user
 
 
 class ReviewListCreateView(generics.ListCreateAPIView):
@@ -20,7 +21,7 @@ class ReviewListCreateView(generics.ListCreateAPIView):
     serializer_class = ReviewSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
-    filterset_fields = ['rating', 'product', 'is_approved']
+    filterset_fields = ['rating', 'product', 'approval_status']
     ordering_fields = ['created_at', 'rating']
     ordering = ['-created_at']
     search_fields = ['text', 'product__name']
@@ -30,9 +31,8 @@ class ReviewListCreateView(generics.ListCreateAPIView):
         if user.role == 'admin':
             return Review.objects.all()
         else:
-            # المستخدمون العاديون يرون المراجعات المعتمدة فقط + مراجعاتهم الخاصة
             return Review.objects.filter(
-                Q(is_approved=True) | Q(user=user)
+                Q(approval_status='approved') | Q(user=user)
             )
 
     def get_serializer_class(self):
@@ -57,7 +57,7 @@ class ReviewDetailView(generics.RetrieveUpdateDestroyAPIView):
             return Review.objects.all()
         else:
             return Review.objects.filter(
-                Q(is_approved=True) | Q(user=user)
+                Q(approval_status='approved') | Q(user=user)
             )
 
     def get_serializer_class(self):
@@ -81,7 +81,7 @@ class ProductReviewsView(generics.ListAPIView):
         product_id = self.kwargs['product_id']
         return Review.objects.filter(
             product_id=product_id,
-            is_approved=True
+            approval_status='approved'
         )
 
 
@@ -116,8 +116,9 @@ def approve_review(request, review_id):
 
     try:
         review = Review.objects.get(id=review_id)
-        review.is_approved = True
+        review.approval_status = 'approved'
         review.save()
+        notify_user(review)
         return Response(
             {"message": "تم اعتماد المراجعة بنجاح"},
             status=status.HTTP_200_OK
@@ -143,7 +144,7 @@ def reject_review(request, review_id):
 
     try:
         review = Review.objects.get(id=review_id)
-        review.is_approved = False
+        review.approval_status = 'rejected'
         review.save()
         return Response(
             {"message": "تم رفض المراجعة"},
@@ -168,6 +169,6 @@ def pending_reviews(request):
             status=status.HTTP_403_FORBIDDEN
         )
 
-    reviews = Review.objects.filter(is_approved=False)
+    reviews = Review.objects.filter(approval_status='pending')
     serializer = ReviewSerializer(reviews, many=True)
     return Response(serializer.data)

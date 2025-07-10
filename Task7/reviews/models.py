@@ -27,7 +27,18 @@ class Review(models.Model):
     text = models.TextField(verbose_name="نص المراجعة")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    is_approved = models.BooleanField(default=False, verbose_name="معتمدة")
+    APPROVAL_CHOICES = [
+        ('pending', 'معلق'),
+        ('approved', 'مقبول'),
+        ('rejected', 'مرفوض'),
+    ]
+
+    approval_status = models.CharField(
+        max_length=10,
+        choices=APPROVAL_CHOICES,
+        default='pending',
+        verbose_name="حالة الموافقة"
+    )
 
     class Meta:
         ordering = ['-created_at']
