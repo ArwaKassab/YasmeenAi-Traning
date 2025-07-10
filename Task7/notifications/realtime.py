@@ -10,6 +10,7 @@ def notify_user(review):
     channel_layer = get_channel_layer()
 
     async_to_sync(channel_layer.group_send)(
+
         f"user_{review.user.id}",  
         {
             "type": "send_notification",  
