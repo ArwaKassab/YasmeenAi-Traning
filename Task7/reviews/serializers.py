@@ -60,4 +60,4 @@ class ProductRatingSummarySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'average_rating', 'reviews_count']
+        fields = ['id', 'name', 'average_rating', 'reviews_count','comments']
