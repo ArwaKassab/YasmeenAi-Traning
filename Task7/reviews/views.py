@@ -9,9 +9,11 @@ from products.models import Product
 from .serializers import (
     ReviewSerializer, ReviewCreateSerializer,
     ReviewUpdateSerializer, ProductRatingSummarySerializer
+    ,ReviewDetailSerializer
 )
 from .permissions import IsOwnerOrReadOnly, IsAdminOrReadOnly
 from notifications.realtime import notify_user
+from django.db import models
 
 
 class ReviewListCreateView(generics.ListCreateAPIView):
@@ -63,7 +65,19 @@ class ReviewDetailView(generics.RetrieveUpdateDestroyAPIView):
     def get_serializer_class(self):
         if self.request.method in ['PUT', 'PATCH']:
             return ReviewUpdateSerializer
-        return ReviewSerializer
+        return ReviewDetailSerializer
+    
+        """
+    حساب عدد المشاهدات
+    """
+    def get_object(self):
+        obj = super().get_object()
+
+        obj.views = models.F('views') + 1  
+        obj.save(update_fields=["views"]) 
+
+        obj.refresh_from_db() 
+        return obj
 
 
 class ProductReviewsView(generics.ListAPIView):

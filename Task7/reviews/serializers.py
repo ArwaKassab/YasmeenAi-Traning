@@ -1,20 +1,25 @@
 from rest_framework import serializers
 from .models import Review
 from products.models import Product
+from review_comments.serializers import ReviewCommentSerializer  # استيراد الردود
 
 
 class ReviewSerializer(serializers.ModelSerializer):
     user_name = serializers.CharField(source='user.username', read_only=True)
     product_name = serializers.CharField(source='product.name', read_only=True)
-
+    comments_count = serializers.SerializerMethodField()
     class Meta:
         model = Review
         fields = [
             'id', 'product', 'user', 'user_name', 'product_name',
-            'rating', 'text', 'created_at', 'updated_at', 'approval_status'
+            'rating', 'text', 'created_at', 'updated_at', 'approval_status',
+            'comments_count' , 'views'
         ]
         read_only_fields = ['user', 'created_at', 'updated_at']
 
+    def get_comments_count(self, obj):
+        return obj.comments.count()
+    
     def validate_rating(self, value):
         if value < 1 or value > 5:
             raise serializers.ValidationError("التقييم يجب أن يكون بين 1 و 5")
@@ -60,4 +65,19 @@ class ProductRatingSummarySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'average_rating', 'reviews_count','comments']
+        fields = ['id', 'name', 'average_rating', 'reviews_count']
+
+
+class ReviewDetailSerializer(serializers.ModelSerializer):
+    user_name = serializers.CharField(source='user.username', read_only=True)
+    product_name = serializers.CharField(source='product.name', read_only=True)
+    comments = ReviewCommentSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Review
+        fields = [
+            'id', 'product', 'user', 'user_name', 'product_name',
+            'rating', 'text', 'created_at', 'updated_at',
+            'approval_status', 'views', 'comments'
+        ]
+        read_only_fields = ['user', 'created_at', 'updated_at']
