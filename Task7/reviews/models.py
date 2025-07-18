@@ -25,7 +25,7 @@ class Review(models.Model):
         verbose_name="التقييم"
     )
     text = models.TextField(verbose_name="نص المراجعة")
-    views = models.PositiveIntegerField(default=0, verbose_name="عدد المشاهدات")  # ✅ أضف هذا السطر هنا
+    views = models.PositiveIntegerField(default=0, verbose_name="عدد المشاهدات") 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     APPROVAL_CHOICES = [
@@ -43,7 +43,7 @@ class Review(models.Model):
 
     class Meta:
         ordering = ['-created_at']
-        unique_together = ('product', 'user')  # مستخدم واحد لكل منتج
+        unique_together = ('product', 'user')  
         verbose_name = "مراجعة"
         verbose_name_plural = "المراجعات"
 

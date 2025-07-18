@@ -12,6 +12,7 @@ from .serializers import (
     ,ReviewDetailSerializer
 )
 from .permissions import IsOwnerOrReadOnly, IsAdminOrReadOnly
+from notifications.models import Notification
 from notifications.realtime import notify_user
 from django.db import models
 
@@ -42,9 +43,21 @@ class ReviewListCreateView(generics.ListCreateAPIView):
             return ReviewCreateSerializer
         return ReviewSerializer
 
+    def create(self, request, *args, **kwargs):
+        """
+        إنشاء مراجعة مع رد مخصص يحتوي على رسالة توضيحية
+        """
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+
+        return Response({
+            "message": " تمت إضافة المراجعة بنجاح. سيتم مراجعتها من قبل الإدارة قبل عرضها.",
+            "review": serializer.data
+        }, status=status.HTTP_201_CREATED)
+
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-
 
 class ReviewDetailView(generics.RetrieveUpdateDestroyAPIView):
     """
@@ -132,7 +145,15 @@ def approve_review(request, review_id):
         review = Review.objects.get(id=review_id)
         review.approval_status = 'approved'
         review.save()
+
         notify_user(review)
+        Notification.objects.create(
+            user=review.user,
+            title="✅ تمت الموافقة على مراجعتك",
+            message=f"تمت الموافقة على مراجعتك للمنتج: {review.product.name}",
+            review=review
+        )
+
         return Response(
             {"message": "تم اعتماد المراجعة بنجاح"},
             status=status.HTTP_200_OK
@@ -142,7 +163,6 @@ def approve_review(request, review_id):
             {"error": "المراجعة غير موجودة"},
             status=status.HTTP_404_NOT_FOUND
         )
-
 
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
