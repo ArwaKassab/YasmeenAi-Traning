@@ -3,7 +3,7 @@ from django.db import models
 # Create your models here.
 from django.db import models
 from django.conf import settings
-from reviews.models import Review  # تأكدي أن app 'reviews' مضاف لـ INSTALLED_APPS
+from reviews.models import Review 
 
 class ReviewComment(models.Model):
     review = models.ForeignKey(Review, on_delete=models.CASCADE, related_name='comments')

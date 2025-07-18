@@ -9,7 +9,9 @@ urlpatterns = [
     path('api/auth/', include('accounts.urls')),
     path('api/products/', include('products.urls')),
     path('api/reviews/', include('reviews.urls')),
-    path('api/reviews/comments/', include('review_comments.urls')),
+    path('api/reviews/', include('review_comments.urls')),
+    path('api/notifications/', include('notifications.urls')),
+    path('api/reviews/reports/', include('review_reports.urls'))
 ]
 
 if settings.DEBUG:

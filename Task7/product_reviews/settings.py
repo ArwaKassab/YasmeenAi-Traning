@@ -49,7 +49,9 @@ INSTALLED_APPS = [
     'django_filters',
     'channels',
     'notifications',
-    'review_comments'
+    'review_comments',
+    'review_reports',
+
 
 ]
 

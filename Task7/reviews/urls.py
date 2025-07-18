@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .report_views import AdminReportView
+from .report_views import AdminReportView,OffensiveReviewListView
 urlpatterns = [
     # مراجعات عامة
     path('', views.ReviewListCreateView.as_view(), name='review-list-create'),
@@ -19,5 +19,6 @@ urlpatterns = [
    
     # تقارير المراجعات (للمدراء)
      path('admin/reports/', AdminReportView.as_view(), name='admin-reports'),
+     path('admin/offensive-reviews/', OffensiveReviewListView.as_view(), name='offensive-reviews'),
 
 ]
