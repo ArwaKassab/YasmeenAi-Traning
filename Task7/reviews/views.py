@@ -15,6 +15,7 @@ from .permissions import IsOwnerOrReadOnly, IsAdminOrReadOnly
 from notifications.models import Notification
 from notifications.realtime import notify_user
 from django.db import models
+from .filters import ReviewFilter
 
 
 class ReviewListCreateView(generics.ListCreateAPIView):
@@ -24,19 +25,44 @@ class ReviewListCreateView(generics.ListCreateAPIView):
     serializer_class = ReviewSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
-    filterset_fields = ['rating', 'product', 'approval_status']
-    ordering_fields = ['created_at', 'rating']
+    filterset_class = ReviewFilter
+    ordering_fields = ['created_at', 'rating', 'views']
     ordering = ['-created_at']
     search_fields = ['text', 'product__name']
 
     def get_queryset(self):
         user = self.request.user
+
         if user.role == 'admin':
-            return Review.objects.all()
+            queryset = Review.objects.all()
         else:
-            return Review.objects.filter(
+            queryset = Review.objects.filter(
                 Q(approval_status='approved') | Q(user=user)
             )
+
+        # إضافة annotations للترتيب المتقدم
+        queryset = queryset.annotate(
+            total_interactions=models.Count('interactions'),
+            helpful_interactions=models.Count('interactions', filter=Q(interactions__interaction_type='helpful')),
+            helpfulness_score=models.Case(
+                models.When(total_interactions=0, then=0),
+                default=models.F('helpful_interactions') * 100.0 / models.F('total_interactions'),
+                output_field=models.FloatField()
+            )
+        )
+
+        # تطبيق الترتيب المخصص
+        ordering = self.request.query_params.get('ordering', '')
+        if ordering == 'most_interactive':
+            queryset = queryset.order_by('-total_interactions', '-created_at')
+        elif ordering == 'highest_rated':
+            queryset = queryset.order_by('-rating', '-created_at')
+        elif ordering == 'most_helpful':
+            queryset = queryset.order_by('-helpfulness_score', '-helpful_interactions', '-created_at')
+        elif ordering == 'most_viewed':
+            queryset = queryset.order_by('-views', '-created_at')
+
+        return queryset
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -79,7 +105,7 @@ class ReviewDetailView(generics.RetrieveUpdateDestroyAPIView):
         if self.request.method in ['PUT', 'PATCH']:
             return ReviewUpdateSerializer
         return ReviewDetailSerializer
-    
+
         """
     حساب عدد المشاهدات
     """
