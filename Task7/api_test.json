@@ -1,0 +1,365 @@
+
+{
+  "reviews_api_tests": {
+    "base_url": "http://0.0.0.0:8000/api",
+    "auth": {
+      "login_endpoint": "/auth/login/",
+      "test_credentials": {
+        "email": "user@example.com",
+        "password": "testpass123"
+      }
+    },
+    "endpoints": [
+      {
+        "name": "User Login",
+        "method": "POST",
+        "url": "/auth/login/",
+        "requires_auth": false,
+        "body": {
+          "email": "user@example.com",
+          "password": "testpass123"
+        },
+        "description": "تسجيل دخول المستخدم للحصول على token"
+      },
+      {
+        "name": "List All Reviews",
+        "method": "GET",
+        "url": "/reviews/",
+        "requires_auth": true,
+        "description": "عرض جميع المراجعات"
+      },
+      {
+        "name": "Create Review",
+        "method": "POST",
+        "url": "/reviews/",
+        "requires_auth": true,
+        "body": {
+          "product": 1,
+          "rating": 5,
+          "text": "مراجعة ممتازة للمنتج"
+        },
+        "description": "إنشاء مراجعة جديدة"
+      },
+      {
+        "name": "Get Review Details",
+        "method": "GET",
+        "url": "/reviews/1/",
+        "requires_auth": false,
+        "description": "عرض تفاصيل مراجعة محددة"
+      },
+      {
+        "name": "Update Review",
+        "method": "PUT",
+        "url": "/reviews/1/",
+        "requires_auth": true,
+        "body": {
+          "rating": 4,
+          "text": "مراجعة محدثة"
+        },
+        "description": "تحديث مراجعة موجودة"
+      },
+      {
+        "name": "Delete Review",
+        "method": "DELETE",
+        "url": "/reviews/1/",
+        "requires_auth": true,
+        "description": "حذف مراجعة"
+      },
+      {
+        "name": "Product Reviews",
+        "method": "GET",
+        "url": "/reviews/product/1/",
+        "requires_auth": false,
+        "description": "عرض مراجعات منتج محدد"
+      },
+      {
+        "name": "Product Rating Summary",
+        "method": "GET",
+        "url": "/reviews/product/1/summary/",
+        "requires_auth": false,
+        "description": "ملخص تقييم المنتج"
+      },
+      {
+        "name": "Approve Review (Admin)",
+        "method": "POST",
+        "url": "/reviews/1/approve/",
+        "requires_auth": true,
+        "admin_only": true,
+        "description": "الموافقة على مراجعة (مدراء فقط)"
+      },
+      {
+        "name": "Reject Review (Admin)",
+        "method": "POST",
+        "url": "/reviews/1/reject/",
+        "requires_auth": true,
+        "admin_only": true,
+        "description": "رفض مراجعة (مدراء فقط)"
+      },
+      {
+        "name": "Pending Reviews (Admin)",
+        "method": "GET",
+        "url": "/reviews/pending/",
+        "requires_auth": true,
+        "admin_only": true,
+        "description": "عرض المراجعات المعلقة (مدراء فقط)"
+      },
+      {
+        "name": "Review Interaction",
+        "method": "POST",
+        "url": "/reviews/1/like/",
+        "requires_auth": true,
+        "body": {
+          "interaction_type": "helpful"
+        },
+        "description": "التفاعل مع مراجعة (مفيدة/غير مفيدة)"
+      },
+      {
+        "name": "Product Analytics",
+        "method": "GET",
+        "url": "/reviews/analytics/products/1/?days=30",
+        "requires_auth": false,
+        "description": "تحليلات المنتج"
+      },
+      {
+        "name": "Top Reviewers",
+        "method": "GET",
+        "url": "/reviews/analytics/top-reviewers/?days=30",
+        "requires_auth": true,
+        "admin_only": true,
+        "description": "أفضل المراجعين"
+      },
+      {
+        "name": "Top Rated Products",
+        "method": "GET",
+        "url": "/reviews/analytics/top-products/?days=30",
+        "requires_auth": false,
+        "description": "المنتجات الأعلى تقييماً"
+      },
+      {
+        "name": "Search Reviews by Keywords",
+        "method": "GET",
+        "url": "/reviews/analytics/search/?keyword=ممتاز",
+        "requires_auth": false,
+        "description": "البحث في المراجعات بالكلمات المفتاحية"
+      }
+    ],
+    "filtering_and_sorting": {
+      "description": "خيارات التصفية والترتيب للمراجعات",
+      "base_endpoint": "/reviews/",
+      "filters": {
+        "rating": {
+          "description": "تصفية حسب التقييم",
+          "examples": [
+            "?rating=5",
+            "?rating=4",
+            "?rating__gte=4",
+            "?rating__lte=2"
+          ]
+        },
+        "high_rating_only": {
+          "description": "مراجعات عالية التقييم (4-5 نجوم)",
+          "examples": ["?high_rating_only=true"]
+        },
+        "low_rating_only": {
+          "description": "مراجعات منخفضة التقييم (1-2 نجمة)",
+          "examples": ["?low_rating_only=true"]
+        },
+        "min_rating": {
+          "description": "حد أدنى للتقييم",
+          "examples": ["?min_rating=3"]
+        },
+        "approval_status": {
+          "description": "حالة الموافقة",
+          "examples": [
+            "?approval_status=approved",
+            "?approval_status=pending",
+            "?approval_status=rejected"
+          ]
+        },
+        "product": {
+          "description": "تصفية حسب المنتج",
+          "examples": ["?product=1"]
+        },
+        "user": {
+          "description": "تصفية حسب المستخدم",
+          "examples": ["?user=1"]
+        },
+        "has_interactions": {
+          "description": "مراجعات لديها تفاعلات",
+          "examples": ["?has_interactions=true"]
+        },
+        "min_views": {
+          "description": "حد أدنى للمشاهدات",
+          "examples": ["?min_views=10"]
+        },
+        "max_views": {
+          "description": "حد أقصى للمشاهدات",
+          "examples": ["?max_views=100"]
+        },
+        "date_from": {
+          "description": "من تاريخ معين",
+          "examples": ["?date_from=2024-01-01"]
+        },
+        "date_to": {
+          "description": "إلى تاريخ معين",
+          "examples": ["?date_to=2024-12-31"]
+        }
+      },
+      "ordering": {
+        "description": "خيارات الترتيب",
+        "options": [
+          {
+            "field": "created_at",
+            "description": "الأحدث أولاً",
+            "example": "?ordering=-created_at"
+          },
+          {
+            "field": "created_at",
+            "description": "الأقدم أولاً",
+            "example": "?ordering=created_at"
+          },
+          {
+            "field": "rating",
+            "description": "الأعلى تقييماً",
+            "example": "?ordering=-rating"
+          },
+          {
+            "field": "views",
+            "description": "الأكثر مشاهدة",
+            "example": "?ordering=-views"
+          },
+          {
+            "field": "highest_rated",
+            "description": "الأعلى تقييماً (مخصص)",
+            "example": "?ordering=highest_rated"
+          },
+          {
+            "field": "most_interactive",
+            "description": "الأكثر تفاعلاً",
+            "example": "?ordering=most_interactive"
+          },
+          {
+            "field": "most_helpful",
+            "description": "الأكثر فائدة",
+            "example": "?ordering=most_helpful"
+          },
+          {
+            "field": "most_viewed",
+            "description": "الأكثر مشاهدة",
+            "example": "?ordering=most_viewed"
+          }
+        ]
+      },
+      "search": {
+        "description": "البحث في النصوص",
+        "examples": [
+          "?search=ممتاز",
+          "?search=جيد",
+          "?search=iPhone"
+        ]
+      },
+      "combined_examples": [
+        {
+          "description": "مراجعات 5 نجوم مرتبة حسب الأكثر تفاعلاً",
+          "url": "?rating=5&ordering=most_interactive"
+        },
+        {
+          "description": "مراجعات عالية التقييم من آخر أسبوع",
+          "url": "?high_rating_only=true&date_from=2024-01-20&ordering=-created_at"
+        },
+        {
+          "description": "مراجعات لمنتج محدد بـ 10+ مشاهدات",
+          "url": "?product=1&min_views=10&ordering=most_viewed"
+        },
+        {
+          "description": "البحث عن كلمة 'رائع' في المراجعات المعتمدة",
+          "url": "?search=رائع&approval_status=approved"
+        }
+      ]
+    },
+    "test_scenarios": [
+      {
+        "name": "Complete Review Workflow",
+        "steps": [
+          "1. تسجيل دخول المستخدم",
+          "2. إنشاء مراجعة جديدة",
+          "3. عرض المراجعة",
+          "4. التفاعل مع المراجعة",
+          "5. تحديث المراجعة",
+          "6. حذف المراجعة"
+        ]
+      },
+      {
+        "name": "Admin Approval Workflow",
+        "steps": [
+          "1. تسجيل دخول المدير",
+          "2. عرض المراجعات المعلقة",
+          "3. الموافقة على مراجعة",
+          "4. رفض مراجعة أخرى"
+        ]
+      },
+      {
+        "name": "Analytics Testing",
+        "steps": [
+          "1. تحليلات منتج محدد",
+          "2. أفضل المنتجات",
+          "3. أفضل المراجعين",
+          "4. البحث بالكلمات المفتاحية"
+        ]
+      },
+      {
+        "name": "Filtering and Sorting",
+        "steps": [
+          "1. تصفية المراجعات حسب التقييم",
+          "2. ترتيب حسب الأكثر تفاعلاً",
+          "3. تصفية المراجعات عالية التقييم",
+          "4. دمج عدة فلاتر معاً"
+        ]
+      }
+    ],
+    "response_examples": {
+      "review_list": {
+        "count": 10,
+        "next": "http://0.0.0.0:8000/api/reviews/?page=2",
+        "previous": null,
+        "results": [
+          {
+            "id": 1,
+            "product": {
+              "id": 1,
+              "name": "iPhone 15 Pro"
+            },
+            "user": {
+              "id": 1,
+              "username": "user1"
+            },
+            "rating": 5,
+            "text": "منتج ممتاز",
+            "views": 15,
+            "helpful_count": 3,
+            "not_helpful_count": 0,
+            "total_interactions": 3,
+            "created_at": "2024-01-26T10:00:00Z",
+            "approval_status": "approved"
+          }
+        ]
+      },
+      "product_analytics": {
+        "product_id": 1,
+        "product_name": "iPhone 15 Pro",
+        "total_reviews": 15,
+        "average_rating": 4.2,
+        "period_reviews": 8,
+        "period_average_rating": 4.5,
+        "rating_distribution": {
+          "1_stars": 0,
+          "2_stars": 1,
+          "3_stars": 2,
+          "4_stars": 3,
+          "5_stars": 2
+        },
+        "period_days": 30
+      }
+    }
+  }
+}
