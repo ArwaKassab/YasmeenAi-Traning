@@ -28,7 +28,7 @@ class Product(models.Model):
     @property
     def average_rating(self):
         """حساب متوسط التقييم للمراجعات المعتمدة"""
-        approved_reviews = self.reviews.filter(is_approved=True)
+        approved_reviews = self.reviews.filter(approval_status='approved')
         if approved_reviews.exists():
             return round(approved_reviews.aggregate(
                 models.Avg('rating')
@@ -38,4 +38,4 @@ class Product(models.Model):
     @property
     def reviews_count(self):
         """عدد المراجعات المعتمدة"""
-        return self.reviews.filter(is_approved=True).count()
+        return self.reviews.filter(approval_status='approved').count()
