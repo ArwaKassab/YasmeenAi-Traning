@@ -29,6 +29,9 @@ class ReviewSerializer(ReviewReportFieldsMixin, serializers.ModelSerializer):
     comments_count = serializers.SerializerMethodField()
     has_report = serializers.SerializerMethodField()
     report_id = serializers.SerializerMethodField()
+    helpful_count = serializers.SerializerMethodField()
+    not_helpful_count = serializers.SerializerMethodField()
+    user_interaction = serializers.SerializerMethodField()
 
 
     class Meta:
@@ -36,12 +39,30 @@ class ReviewSerializer(ReviewReportFieldsMixin, serializers.ModelSerializer):
         fields = [
             'id', 'product', 'user', 'user_name', 'product_name',
             'rating', 'text', 'created_at', 'updated_at', 'approval_status',
-            'comments_count', 'views', 'has_report', 'report_id'
+            'comments_count', 'views', 'has_report', 'report_id',
+            'helpful_count', 'not_helpful_count', 'user_interaction'
         ]
         read_only_fields = ['user', 'created_at', 'updated_at']
 
     def get_comments_count(self, obj):
         return obj.comments.count()
+
+    def get_helpful_count(self, obj):
+        return obj.helpful_count
+
+    def get_not_helpful_count(self, obj):
+        return obj.not_helpful_count
+
+    def get_user_interaction(self, obj):
+        """الحصول على تفاعل المستخدم الحالي مع المراجعة"""
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            try:
+                interaction = obj.interactions.get(user=request.user)
+                return interaction.interaction_type
+            except:
+                return None
+        return None
 
     def validate_rating(self, value):
         if value < 1 or value > 5:
@@ -96,6 +117,9 @@ class ReviewDetailSerializer(ReviewReportFieldsMixin, serializers.ModelSerialize
     comments_count = serializers.SerializerMethodField()
     has_report = serializers.SerializerMethodField()
     report_id = serializers.SerializerMethodField()
+    helpful_count = serializers.SerializerMethodField()
+    not_helpful_count = serializers.SerializerMethodField()
+    user_interaction = serializers.SerializerMethodField()
 
 
     class Meta:
@@ -104,9 +128,27 @@ class ReviewDetailSerializer(ReviewReportFieldsMixin, serializers.ModelSerialize
             'id', 'product', 'user', 'user_name', 'product_name',
             'rating', 'text', 'created_at', 'updated_at',
             'approval_status', 'views', 'comments',
-            'comments_count', 'has_report', 'report_id'
+            'comments_count', 'has_report', 'report_id',
+            'helpful_count', 'not_helpful_count', 'user_interaction'
         ]
         read_only_fields = ['user', 'created_at', 'updated_at']
 
     def get_comments_count(self, obj):
         return obj.comments.count()
+
+    def get_helpful_count(self, obj):
+        return obj.helpful_count
+
+    def get_not_helpful_count(self, obj):
+        return obj.not_helpful_count
+
+    def get_user_interaction(self, obj):
+        """الحصول على تفاعل المستخدم الحالي مع المراجعة"""
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            try:
+                interaction = obj.interactions.get(user=request.user)
+                return interaction.interaction_type
+            except:
+                return None
+        return None
