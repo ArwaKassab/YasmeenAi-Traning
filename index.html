@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Notification Test</title>
+</head>
+<body>
+  <h2>WebSocket Notifications</h2>
+
+  <input type="text" id="token" placeholder="Enter JWT token" style="width: 300px;" />
+  <button onclick="connectWebSocket()">Connect</button>
+
+  <div id="status" style="margin: 10px 0;"></div>
+  <ul id="messages"></ul>
+
+  <script>
+    let socket;
+
+    function connectWebSocket() {
+      const token = document.getElementById("token").value;
+      const wsUrl = `ws://127.0.0.1:8000/ws/notifications/?token=${token}`;
+
+      socket = new WebSocket(wsUrl);
+
+      document.getElementById("status").innerText = "🔄 Connecting...";
+
+      socket.onopen = () => {
+        document.getElementById("status").innerText = "✅ Connected";
+      };
+
+      socket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        const li = document.createElement("li");
+        li.textContent = data.message;
+        document.getElementById("messages").appendChild(li);
+      };
+
+      socket.onclose = () => {
+        document.getElementById("status").innerText = "❌ Disconnected";
+      };
+
+      socket.onerror = () => {
+        document.getElementById("status").innerText = "⚠️ Error";
+      };
+    }
+  </script>
+</body>
+</html>
+
