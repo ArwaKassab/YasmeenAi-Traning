@@ -86,6 +86,61 @@ def test_analytics_and_interactions():
         print(json.dumps(top_products_response.json(), indent=2, ensure_ascii=False))
     else:
         print(f"❌ فشل في الحصول على أفضل المنتجات: {top_products_response.status_code}")
+    
+    # 6. اختبار الترتيب والتصفية
+    print("\n6️⃣ اختبار الترتيب والتصفية...")
+    
+    # اختبار ترتيب المراجعات حسب الأعلى تقييم
+    print("\n📋 اختبار ترتيب حسب الأعلى تقييم...")
+    highest_rated_response = requests.get(
+        f"{BASE_URL}/reviews/?ordering=highest_rated"
+    )
+    
+    if highest_rated_response.status_code == 200:
+        print("✅ تم الترتيب حسب الأعلى تقييم بنجاح")
+        reviews = highest_rated_response.json().get('results', [])
+        if reviews:
+            print(f"أول مراجعة: {reviews[0].get('rating')} نجوم")
+    
+    # اختبار تصفية المراجعات 5 نجوم فقط
+    print("\n⭐ اختبار تصفية مراجعات 5 نجوم...")
+    five_star_response = requests.get(
+        f"{BASE_URL}/reviews/?rating=5"
+    )
+    
+    if five_star_response.status_code == 200:
+        print("✅ تم تصفية مراجعات 5 نجوم بنجاح")
+        reviews = five_star_response.json().get('results', [])
+        print(f"عدد مراجعات 5 نجوم: {len(reviews)}")
+    
+    # اختبار ترتيب حسب الأكثر تفاعلاً
+    print("\n🔥 اختبار ترتيب حسب الأكثر تفاعلاً...")
+    most_interactive_response = requests.get(
+        f"{BASE_URL}/reviews/?ordering=most_interactive"
+    )
+    
+    if most_interactive_response.status_code == 200:
+        print("✅ تم الترتيب حسب الأكثر تفاعلاً بنجاح")
+    
+    # اختبار تصفية المراجعات عالية التقييم (4-5 نجوم)
+    print("\n🌟 اختبار تصفية المراجعات عالية التقييم...")
+    high_rating_response = requests.get(
+        f"{BASE_URL}/reviews/?high_rating_only=true"
+    )
+    
+    if high_rating_response.status_code == 200:
+        print("✅ تم تصفية المراجعات عالية التقييم بنجاح")
+        reviews = high_rating_response.json().get('results', [])
+        print(f"عدد المراجعات عالية التقييم: {len(reviews)}")
+    
+    # اختبار ترتيب حسب الأكثر مشاهدة
+    print("\n👁️ اختبار ترتيب حسب الأكثر مشاهدة...")
+    most_viewed_response = requests.get(
+        f"{BASE_URL}/reviews/?ordering=most_viewed"
+    )
+    
+    if most_viewed_response.status_code == 200:
+        print("✅ تم الترتيب حسب الأكثر مشاهدة بنجاح")
 
 if __name__ == "__main__":
     test_analytics_and_interactions()

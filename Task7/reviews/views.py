@@ -31,12 +31,37 @@ class ReviewListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         user = self.request.user
+
         if user.role == 'admin':
-            return Review.objects.all()
+            queryset = Review.objects.all()
         else:
-            return Review.objects.filter(
+            queryset = Review.objects.filter(
                 Q(approval_status='approved') | Q(user=user)
             )
+
+        # إضافة annotations للترتيب المتقدم
+        queryset = queryset.annotate(
+            total_interactions=models.Count('interactions'),
+            helpful_interactions=models.Count('interactions', filter=Q(interactions__interaction_type='helpful')),
+            helpfulness_score=models.Case(
+                models.When(total_interactions=0, then=0),
+                default=models.F('helpful_interactions') * 100.0 / models.F('total_interactions'),
+                output_field=models.FloatField()
+            )
+        )
+
+        # تطبيق الترتيب المخصص
+        ordering = self.request.query_params.get('ordering', '')
+        if ordering == 'most_interactive':
+            queryset = queryset.order_by('-total_interactions', '-created_at')
+        elif ordering == 'highest_rated':
+            queryset = queryset.order_by('-rating', '-created_at')
+        elif ordering == 'most_helpful':
+            queryset = queryset.order_by('-helpfulness_score', '-helpful_interactions', '-created_at')
+        elif ordering == 'most_viewed':
+            queryset = queryset.order_by('-views', '-created_at')
+
+        return queryset
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -79,7 +104,7 @@ class ReviewDetailView(generics.RetrieveUpdateDestroyAPIView):
         if self.request.method in ['PUT', 'PATCH']:
             return ReviewUpdateSerializer
         return ReviewDetailSerializer
-    
+
         """
     حساب عدد المشاهدات
     """
