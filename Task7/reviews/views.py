@@ -15,6 +15,7 @@ from .permissions import IsOwnerOrReadOnly, IsAdminOrReadOnly
 from notifications.models import Notification
 from notifications.realtime import notify_user
 from django.db import models
+from .filters import ReviewFilter
 
 
 class ReviewListCreateView(generics.ListCreateAPIView):
@@ -24,8 +25,8 @@ class ReviewListCreateView(generics.ListCreateAPIView):
     serializer_class = ReviewSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
-    filterset_fields = ['rating', 'product', 'approval_status']
-    ordering_fields = ['created_at', 'rating']
+    filterset_class = ReviewFilter
+    ordering_fields = ['created_at', 'rating', 'views']
     ordering = ['-created_at']
     search_fields = ['text', 'product__name']
 
