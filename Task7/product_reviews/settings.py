@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure--1b!(e57@$m2zk14v&ns+b214ix8f7lgx%qryybdf&3-t-2#h+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -90,14 +90,11 @@ WSGI_APPLICATION = 'product_reviews.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'task7_db',
-        'USER': 'postgres',
-        'PASSWORD': 'arwa',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
 
 
 # Password validation
