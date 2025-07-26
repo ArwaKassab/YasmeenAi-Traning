@@ -46,7 +46,6 @@ INSTALLED_APPS = [
     'accounts',
     'products',
     'reviews',
-    'reviews.interactions_models',
     'django_filters',
     'channels',
     'notifications',
