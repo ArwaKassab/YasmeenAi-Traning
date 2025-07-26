@@ -31,7 +31,6 @@ class ReviewInteractionView(generics.CreateAPIView):
                 {"error": "المراجعة غير موجودة أو غير معتمدة"},
                 status=status.HTTP_404_NOT_FOUND
             )
-
         # التحقق من وجود تفاعل سابق وتحديثه أو إنشاء جديد
         interaction, created = ReviewInteraction.objects.update_or_create(
             user=request.user,
@@ -85,13 +84,11 @@ def product_analytics(request, product_id):
     rating_distribution = {}
     for i in range(1, 6):
         rating_distribution[f'{i}_stars'] = period_reviews.filter(rating=i).count()
-
     # أفضل مراجعة بناءً على التفاعل
     top_review = all_reviews.annotate(
         helpful_count=Count('interactions', filter=Q(interactions__interaction_type='helpful')),
         total_interactions=Count('interactions')
     ).filter(total_interactions__gt=0).order_by('-helpful_count', '-total_interactions').first()
-
     analytics_data = {
         'product_id': product.id,
         'product_name': product.name,
@@ -103,7 +100,6 @@ def product_analytics(request, product_id):
         'top_review': top_review,
         'period_days': days
     }
-
     serializer = ProductAnalyticsSerializer(analytics_data, context={'request': request})
     return Response(serializer.data)
 
@@ -131,7 +127,6 @@ def top_reviewers(request):
         reviews_count=Count('reviews'),
         average_rating_given=Avg('reviews__rating')
     ).filter(reviews_count__gt=0).order_by('-reviews_count')[:10]
-
     data = []
     for user in top_reviewers:
         data.append({
@@ -141,7 +136,6 @@ def top_reviewers(request):
             'reviews_count': user.reviews_count,
             'average_rating_given': round(user.average_rating_given, 2)
         })
-
     serializer = TopReviewersSerializer(data, many=True)
     return Response(serializer.data)
 
@@ -154,7 +148,6 @@ def top_rated_products(request):
     """
     days = int(request.query_params.get('days', 30))
     start_date = timezone.now() - timedelta(days=days)
-
     products = Product.objects.filter(
         reviews__approval_status='approved',
         reviews__created_at__gte=start_date
@@ -164,7 +157,6 @@ def top_rated_products(request):
     ).filter(
         period_reviews_count__gte=3  # على الأقل 3 مراجعات
     ).order_by('-period_average_rating')[:10]
-
     data = []
     for product in products:
         data.append({
@@ -173,7 +165,6 @@ def top_rated_products(request):
             'period_reviews_count': product.period_reviews_count,
             'period_average_rating': round(product.period_average_rating, 2)
         })
-
     return Response(data)
 
 
@@ -189,12 +180,10 @@ def search_reviews_by_keywords(request):
             {"error": "يجب تحديد كلمة مفتاحية للبحث"},
             status=status.HTTP_400_BAD_REQUEST
         )
-
     reviews = Review.objects.filter(
         Q(text__icontains=keyword),
         approval_status='approved'
     ).select_related('user', 'product').order_by('-created_at')
-
     data = {
         'keyword': keyword,
         'reviews': reviews
